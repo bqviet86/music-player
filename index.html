@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+
+<body>
+    <div class="app">
+        <div class="main">
+            <div class="main-item dashboard">
+                <div class="cd">
+                    <div class="cd-thumb"></div>
+                </div>
+
+                <div class="desc">
+                    <div class="name"></div>
+                    <div class="singer"></div>
+                </div>
+
+                <div class="time-line">
+                    <input type="range" class="range" value="0" step="0.01" min="0" max="100">
+                    <div class="progress-wrap">
+                        <div class="progress"></div>
+                    </div>
+                </div>
+
+                <div class="time">
+                    <div class="time-left"></div>
+                    <div class="time-right"></div>
+                </div>
+
+                <div class="control">
+                    <div class="btn btn-random">
+                        <ion-icon name="shuffle-outline"></ion-icon>
+                    </div>
+                    <div class="btn btn-prev">
+                        <ion-icon name="play-back-outline"></ion-icon>
+                    </div>
+                    <div class="btn btn-toggle-play">
+                        <ion-icon name="play-outline" class="icon-play play"></ion-icon>
+                        <ion-icon name="pause-outline" class="icon-pause"></ion-icon>
+                    </div>
+                    <div class="btn btn-next">
+                        <ion-icon name="play-forward-outline"></ion-icon>
+                    </div>
+                    <div class="btn btn-repeat">
+                        <ion-icon name="repeat-outline"></ion-icon>
+                    </div>
+                </div>
+            </div>
+            <div class="main-item playlist"></div>
+        </div>
+    </div>
+
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <script src="./assets/js/index.js"></script>
+</body>
+
+</html>
