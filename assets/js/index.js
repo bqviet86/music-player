@@ -199,8 +199,6 @@ let app = {
         inputRange.value = songPlayedPercent
         app.progressUpdate()
         app.renderTimeSong(this.currentTime, timeCurrent)
-
-        app.setConfig('audioCurrentTime', this.currentTime)
     },
 
     updateSongOnInput() {
@@ -229,7 +227,6 @@ let app = {
         this.loadCurrentSong()
         this.handleEvent()
         this.currentAudio.play()
-        this.setConfig('currentIndex', this.currentIndex)
     },
 
     nextSong() {
@@ -289,6 +286,14 @@ let app = {
     },
 
     handleEvent() {
+        // Lưu lại config của trang
+        window.onbeforeunload = () => {
+            this.setConfig('currentIndex', this.currentIndex)
+            this.setConfig('audioCurrentTime', this.currentAudio.currentTime)
+            this.setConfig('isRandom', this.isRandom)
+            this.setConfig('isRepeat', this.isRepeat)
+        }
+
         // Xử lý tải lên thời gian bài hát
         getAll('.playlist audio').forEach((audio, index)=> {
             audio.onloadedmetadata = (e) => {
@@ -382,14 +387,12 @@ let app = {
         randomBtn.onclick = () => {
             this.isRandom = !this.isRandom
             randomBtn.classList.toggle('active', this.isRandom)
-            this.setConfig('isRandom', this.isRandom)
         }
 
         // Khi nhấn nút vòng lặp
         repeatBtn.onclick = () => {
             this.isRepeat = !this.isRepeat
             repeatBtn.classList.toggle('active', this.isRepeat)
-            this.setConfig('isRepeat', this.isRepeat)
         }
 
         // Khi kết thúc bài hát
