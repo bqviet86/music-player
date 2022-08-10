@@ -31,6 +31,7 @@ let app = {
     currentIndex: 0,
     isPlaying: false,
     isRandom: false,
+    songDurationList: [],
     randomSongList: [],
     isRepeat: false,
     config: JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)) || {},
@@ -194,22 +195,42 @@ let app = {
     },
 
     timelineUpdate() {
-        let songPlayedPercent = this.currentTime * 100 / this.duration
-
+        let songPlayedPercent = this.currentAudio.currentTime * 100 / this.currentAudio.duration
+        
         inputRange.value = songPlayedPercent
-        app.progressUpdate()
-        app.renderTimeSong(this.currentTime, timeCurrent)
+        this.progressUpdate()
+        this.renderTimeSong(this.currentAudio.currentTime, timeCurrent)
+    },
+
+    currentTimeUpdate() {
+        if(this.currentAudio.currentTime > this.songDurationList[this.currentIndex]) {
+            if(timeCurrent.innerHTML !== timeEnd.innerHTML) {
+                if(this.isRepeat) {
+                    this.currentAudio.currentTime = 0
+                } else {
+                    nextBtn.click()
+                }
+            }
+        }
+    },
+
+    handleTimeUpdate() {
+        app.timelineUpdate()
+        app.currentTimeUpdate()
+        app.setConfig('audioCurrentTime', app.currentAudio.currentTime)
     },
 
     updateSongOnInput() {
         let newCurrentTime = inputRange.value * this.currentAudio.duration / 100
 
         this.currentAudio.currentTime = newCurrentTime
-        this.currentAudio.addEventListener('timeupdate', this.timelineUpdate)
+        this.currentAudio.addEventListener('timeupdate', this.handleTimeUpdate)
 
         if(this.isPlaying) {
             this.currentAudio.play()
         }
+
+        this.handleEvent()
     },
 
     resetOldSong() {
@@ -227,6 +248,7 @@ let app = {
         this.loadCurrentSong()
         this.handleEvent()
         this.currentAudio.play()
+        this.setConfig('currentIndex', this.currentIndex)
     },
 
     nextSong() {
@@ -286,18 +308,11 @@ let app = {
     },
 
     handleEvent() {
-        // Lưu lại config của trang
-        window.onbeforeunload = () => {
-            this.setConfig('currentIndex', this.currentIndex)
-            this.setConfig('audioCurrentTime', this.currentAudio.currentTime)
-            this.setConfig('isRandom', this.isRandom)
-            this.setConfig('isRepeat', this.isRepeat)
-        }
-
         // Xử lý tải lên thời gian bài hát
         getAll('.playlist audio').forEach((audio, index)=> {
-            audio.onloadedmetadata = (e) => {
-                this.renderTimeSong(e.target.duration, e.target.parentElement.querySelector('.time'))
+            audio.onloadedmetadata = () => {
+                this.renderTimeSong(audio.duration, audio.parentElement.querySelector('.time'))
+                this.songDurationList[index] = audio.duration
 
                 if(index === this.currentIndex) {
                     this.renderTimeSong(audio.currentTime, timeCurrent)
@@ -342,20 +357,20 @@ let app = {
         }
 
         // Khi bài hát đang play
-        this.currentAudio.addEventListener('timeupdate', this.timelineUpdate)
+        this.currentAudio.addEventListener('timeupdate', this.handleTimeUpdate)
 
         // Khi tua bài hát
         inputRange.oninput = (e) => {
             let timeOnInput = e.target.value * this.currentAudio.duration / 100
 
-            this.currentAudio.removeEventListener('timeupdate', this.timelineUpdate)
+            this.currentAudio.removeEventListener('timeupdate', this.handleTimeUpdate)
             this.progressUpdate()
             this.renderTimeSong(timeOnInput, timeCurrent)
 
             e.target.onmouseup = () => {
                 this.updateSongOnInput()
             }
-
+    
             e.target.ontouchend = () => {
                 this.updateSongOnInput()
             }
@@ -387,12 +402,14 @@ let app = {
         randomBtn.onclick = () => {
             this.isRandom = !this.isRandom
             randomBtn.classList.toggle('active', this.isRandom)
+            this.setConfig('isRandom', this.isRandom)
         }
 
         // Khi nhấn nút vòng lặp
         repeatBtn.onclick = () => {
             this.isRepeat = !this.isRepeat
             repeatBtn.classList.toggle('active', this.isRepeat)
+            this.setConfig('isRepeat', this.isRepeat)
         }
 
         // Khi kết thúc bài hát
@@ -414,7 +431,7 @@ let app = {
                 this.handleChangeSong()
                 this.scrollToActiveSong()
             }
-        })        
+        })
     },
 
     start() {
